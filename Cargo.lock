@@ -6,8 +6,10 @@ version = 3
 name = "Volume_Tool"
 version = "0.1.0"
 dependencies = [
+ "failure",
  "futures-util",
  "kucoin_rs",
+ "rand",
  "tokio",
 ]
 
