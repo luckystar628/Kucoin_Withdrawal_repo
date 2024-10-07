@@ -9,6 +9,7 @@ dependencies = [
  "failure",
  "futures-util",
  "kucoin_rs",
+ "rand",
  "tokio",
 ]
 

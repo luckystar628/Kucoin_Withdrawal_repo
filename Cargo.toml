@@ -8,3 +8,4 @@ kucoin_rs = { git = "https://github.com/escwdev/kucoin_rs", branch = "master" }
 tokio = {version = "1.28.0", features = ["full"]}
 futures-util = "0.3.21"
 failure = "0.1"
+rand = "0.8"

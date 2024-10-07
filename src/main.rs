@@ -1,13 +1,11 @@
-// use std::env;Z
-use kucoin_rs::kucoin::client::{Kucoin, KucoinEnv};
-use kucoin_rs::failure;
-use failure::{ResultExt, format_err, Error};
 // use kucoin_rs::kucoin::client::{Kucoin, Credentials, KucoinEnv};
 // use kucoin_rs::kucoin::error::APIError;
-// use std::error::Error as OtherError;
-// use kucoin_rs::serde_json;
+use kucoin_rs::kucoin::client::{Kucoin, KucoinEnv};
+use kucoin_rs::failure;
+use failure::format_err;
+use rand::distributions::Uniform;
+use rand::distributions::Distribution;
 
-// use tokio::task;
 struct Withdrawal {
     address: String,
     amount: i32,
@@ -15,24 +13,25 @@ struct Withdrawal {
 
 #[tokio::main]
 async fn main() -> Result<(), failure::Error> {
-    let kucoin_client = Kucoin::new(KucoinEnv::Live, None).expect("failed to get found Kucoin sdk");
-
+    
     let _currency = "SOL";
     let _acct_type = "main";
     let _chain = "OMNI";
-
-    let _checked_sol_balance = check_balance(kucoin_client.clone(), _currency, _acct_type).await;
-    let _withdrawal_fee = check_withdrawal_fee(kucoin_client.clone(), _currency, _chain).await;
-
-    match _withdrawal_fee {
-        Ok(fee) => println!("Withdrawal fee: {}", fee),
-        Err(e) => eprintln!("Failed to get withdrawal fee: {}", e),
-    }
-
-    let address = "6DSudNrFeasRtUjAfDeCF8DFUFm1UiLFnbgvGQNRMPGj";
-    let amount = 1; // Example amount
     
-    withdraw_sol(kucoin_client.clone(), address, amount).await?;
+    // let kucoin_client = Kucoin::new(KucoinEnv::Live, None).expect("failed to get found Kucoin sdk");
+
+    // let _checked_sol_balance = check_balance(kucoin_client.clone(), _currency, _acct_type).await;
+    // let _withdrawal_fee = check_withdrawal_fee(kucoin_client.clone(), _currency, _chain).await;
+
+    // match _withdrawal_fee {
+    //     Ok(fee) => println!("Withdrawal fee: {}", fee),
+    //     Err(e) => eprintln!("Failed to get withdrawal fee: {}", e),
+    // }
+
+    // let address = "6DSudNrFeasRtUjAfDeCF8DFUFm1UiLFnbgvGQNRMPGj";
+    // let amount = 1; // Example amount
+    
+    // withdraw_sol(kucoin_client.clone(), address, amount).await?;
 
     execute_withdrawals(1000, 5000, "SOL", "main", "OMNI").await?;
     Ok(())
@@ -98,7 +97,6 @@ async fn check_withdrawal_fee(
             return Err(e.into());
         }
     }
-    // Ok(())
 }
 
 async fn withdraw_sol(
@@ -116,7 +114,13 @@ async fn withdraw_sol(
 }
 
 
-async fn execute_withdrawals(min_delay: u64, max_delay: u64, _currency: &str, _acct_type: &str,  _chain: &str)-> Result<(), failure::Error> {
+async fn execute_withdrawals(
+    min_delay: u64,
+    max_delay: u64, 
+    _currency: &str, 
+    _acct_type: &str, 
+    _chain: &str
+)-> Result<(), failure::Error> {
     let kucoin_client = Kucoin::new(KucoinEnv::Live, None)?;
 
     let check_balance_result = check_balance(kucoin_client.clone(), _currency, _acct_type).await?;
@@ -142,9 +146,9 @@ async fn execute_withdrawals(min_delay: u64, max_delay: u64, _currency: &str, _a
                 withdrawal.amount, withdrawal.address, remaining_balance
             );
 
-            // let delay = Uniform::new(min_delay, max_delay + 1).sample(&mut rand::thread_rng());
-            // println!("Waiting for {} seconds before next withdrawal...", delay / 1000);
-            // tokio::time::sleep(tokio::time::Duration::from_millis(delay)).await;
+            let delay = Uniform::new(min_delay, max_delay + 1).sample(&mut rand::thread_rng());
+            println!("Waiting for {} seconds before next withdrawal...", delay / 1000);
+            tokio::time::sleep(tokio::time::Duration::from_millis(delay)).await;
 
         } else {
             println!(
@@ -157,4 +161,3 @@ async fn execute_withdrawals(min_delay: u64, max_delay: u64, _currency: &str, _a
     println!("All withdrawals processed.");
     Ok(())
 }
-
